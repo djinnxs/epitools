@@ -1,0 +1,13 @@
+# Dependencias para GeoPandas (GDAL, GEOS, PROJ)
+libgdal-dev
+libgeos-dev
+libproj-dev
+
+# Dependencias para Weasyprint (Pango, Cairo)
+libpango-1.0-0
+libpangocairo-1.0-0
+libgdk-pixbuf2.0-0
+libcairo2
+
+# Dependencias para pyodbc (Driver de ODBC)
+unixodbc-dev
