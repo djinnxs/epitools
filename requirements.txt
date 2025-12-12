@@ -12,7 +12,12 @@ openpyxl
 xlsxwriter
 scikit-learn
 statsmodels
+pandasai
 python-dotenv
+zepid
+prophet
+epilearn
+torch
 duckdb
 pyarrow
 numpy
