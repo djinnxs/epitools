@@ -20,3 +20,4 @@ epilearn
 torch
 duckdb
 pyarrow
+numpy
