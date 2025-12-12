@@ -1,3 +1,11 @@
+---
+title: epitools
+emoji: 📊
+colorFrom: blue
+colorTo: green
+sdk: streamlit
+app_file: app.sh # <--- ¡IMPORTANTE! Esto le dice que use app.sh para iniciar
+---
 # Análisis Epidemiológico en Streamlit
 
 ## Descripción
