@@ -21,3 +21,4 @@ torch
 duckdb
 pyarrow
 numpy
+streamlit-echarts  # <-- Añadido
