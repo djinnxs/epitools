@@ -1,7 +1,4 @@
-# Dependencias Geoespaciales (para geopandas y folium)
 libgdal-dev
-libgeos-dev
-libproj-dev
+libspatialindex-dev
 
-# Dependencias de ODBC (para pyodbc)
 unixodbc-dev
