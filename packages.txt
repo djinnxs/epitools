@@ -1,4 +1,8 @@
+# Mínimo absoluto para geopandas
 libgdal-dev
-libspatialindex-dev
 
+# Mínimo absoluto para pyodbc
 unixodbc-dev
+
+# Compilación general
+g++
