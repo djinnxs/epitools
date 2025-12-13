@@ -1,39 +1,42 @@
-# 1. Usar una imagen base de Python más reciente y completa
+# 1. Usar una imagen base de Python más reciente
 FROM python:3.10-slim
 
-# Establecer la variable de entorno para evitar advertencias de localización
+# Establecer variables de entorno para compilación y localización
 ENV LANG=C.UTF-8
 
-# 2. Copiar archivos de dependencias y código ANTES de instalar dependencias
+# Variables de entorno CRÍTICAS para geopandas y pyodbc:
+# Le dice al compilador dónde buscar las librerías del sistema (libgdal y unixodbc)
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+ENV ACCEPT_GEOS=1
+
+# 2. Copiar archivos y establecer el directorio de trabajo
 COPY requirements.txt /app/requirements.txt
 COPY . /app
-
-# 3. Establecemos el directorio de trabajo
 WORKDIR /app
 
-# 4. Instalar SÓLO el compilador y dependencias del sistema
+# 3. Instalar dependencias del sistema (apt-get)
 RUN apt-get update && apt-get install -y \
     build-essential \
     g++ \
     curl \
     git \
-    # Dependencias Geoespaciales
+    # Dependencias Geoespaciales: CRÍTICAS para GEOPANDAS
     libgdal-dev \
     libgeos-dev \
     libproj-dev \
-    # Dependencias ODBC
+    # Dependencias ODBC: CRÍTICAS para PYODBC
     unixodbc \
     unixodbc-dev \
     libxml2-dev \
     # Limpiamos el caché
     && rm -rf /var/lib/apt/lists/*
 
-# 5. Instalar dependencias de Python (Debería funcionar con el compilador ya listo)
+# 4. Instalar dependencias de Python (pip)
+# Instalamos pip y luego los requisitos
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# 6. Exponer el puerto
+# 5. Exponer y ejecutar
 EXPOSE 8501
-
-# 7. Comando de inicio
 ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
