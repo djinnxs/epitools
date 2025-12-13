@@ -4,7 +4,7 @@ emoji: 📊
 colorFrom: blue
 colorTo: green
 sdk: streamlit
-app_file: app.sh # <--- ¡IMPORTANTE! Esto le dice que use app.sh para iniciar
+app_file: app.py
 ---
 # Análisis Epidemiológico en Streamlit
 
