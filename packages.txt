@@ -1,7 +1,13 @@
-gdal-bin
+# Dependencias para Geoespaciales (geopandas, folium)
 libgdal-dev
 libgeos-dev
 libproj-dev
+
+# Dependencias para Bases de Datos (pyodbc)
 unixodbc
 unixodbc-dev
+libxml2-dev
+
+# Dependencias para Compilación (torch, scikit-learn, prophet)
+build-essential
 g++
