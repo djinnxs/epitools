@@ -1,15 +1,15 @@
-# Usamos una imagen base de Python más estable (3.9)
-FROM python:3.9-slim
+# 1. Usar una imagen base de Python más reciente y completa
+FROM python:3.10-slim
 
-# COPIAR ARCHIVOS AL CONTEXTO ANTES DE SETEAR EL WORKDIR
-# Si este paso falla, es que el repositorio Git no está sincronizado
-COPY . /app
+# 2. Copiar archivos de dependencias y código ANTES de instalar dependencias
+# Esto es esencial para el caching de Docker
 COPY requirements.txt /app/requirements.txt
+COPY . /app
 
-# Establecemos el directorio de trabajo
+# 3. Establecemos el directorio de trabajo
 WORKDIR /app
 
-# 1. Instalar dependencias del sistema (Lista COMPLETA y CORRECTA)
+# 4. Instalar dependencias del sistema (Incluyendo el compilador y dependencias GEO/ODBC)
 RUN apt-get update && apt-get install -y \
     build-essential \
     g++ \
@@ -26,12 +26,12 @@ RUN apt-get update && apt-get install -y \
     # Limpiamos el caché
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Instalar dependencias de Python
+# 5. Instalar dependencias de Python (PyStan ahora debería funcionar)
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# 5. Exponer el puerto
+# 6. Exponer el puerto
 EXPOSE 8501
 
-# 6. Comando de inicio
+# 7. Comando de inicio
 ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
