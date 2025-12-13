@@ -28,8 +28,8 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# 4. Copiar TODO el contenido del proyecto
-COPY . .
+# 4. Copiar TODO el código del proyecto (CORRECCIÓN APLICADA AQUÍ)
+COPY . /app
 
 # 5. Exponer el puerto
 EXPOSE 8501
