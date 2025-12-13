@@ -1,7 +1,8 @@
 # 1. Usar una imagen base de Python más reciente
 FROM python:3.10-slim
 
-# Establecer variables de entorno para compilación y localización
+# ESTA ES LA CORRECCIÓN: Permite la instalación de la librería antigua 'sklearn'
+ENV SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
 ENV LANG=C.UTF-8
 
 # Variables de entorno CRÍTICAS para geopandas y pyodbc:
@@ -31,13 +32,10 @@ RUN apt-get update && apt-get install -y \
     # Limpiamos el caché
     && rm -rf /var/lib/apt/lists/*
 
-# 4. PASO CRÍTICO: Pre-instalar NumPy y Cython antes de requirements.txt
-RUN pip install --upgrade pip
-RUN pip install numpy Cython
+# 4. INSTALACIÓN FINAL
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# 5. Instalar el resto de dependencias de Python
-RUN pip install -r requirements.txt
-
-# 6. Exponer y ejecutar
+# 5. Exponer y ejecutar
 EXPOSE 8501
 ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
