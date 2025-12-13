@@ -1,18 +1,16 @@
-# render.yaml
+
 services:
   - type: web
     name: epitools-streamlit-app
     env: python
     plan: free
-    # Comando de construcción: instala dependencias de Python
+    
     buildCommand: pip install -r requirements.txt
-    # Comando de inicio: ejecuta setup.sh y luego la aplicación Streamlit
+    
     startCommand: sh setup.sh && streamlit run app.py
     
-    # ⚠️ Sección CRUCIAL para librerías como pyodbc y geopandas
-    # Estos son paquetes del sistema operativo que necesitan tus librerías de Python.
     apt:
-      - unixodbc # Para pyodbc
-      - libgdal-dev # Para geopandas
-      - libgeos-dev # Para geopandas
-      - libproj-dev # Para geopandas
+      - unixodbc
+      - libgdal-dev
+      - libgeos-dev
+      - libproj-dev
