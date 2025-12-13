@@ -34,5 +34,5 @@ COPY . /app
 # 5. Exponer el puerto
 EXPOSE 8501
 
-# 6. Comando de inicio (Apuntando a app.py en la raíz)
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# 6. Comando de inicio (Apuntando a la ruta absoluta /app/app.py)
+ENTRYPOINT ["streamlit", "run", "/app/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
