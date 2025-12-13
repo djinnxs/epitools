@@ -28,11 +28,10 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# 4. Copiar TODO el código del proyecto (CORRECCIÓN APLICADA AQUÍ)
-COPY . /app
+# El código se monta automáticamente, por lo que no es necesario el paso 'COPY . /app'
 
 # 5. Exponer el puerto
 EXPOSE 8501
 
-# 6. Comando de inicio (Apuntando a la ruta absoluta /app/app.py)
-ENTRYPOINT ["streamlit", "run", "/app/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# 6. Comando de inicio (Ruta corta, ya que el código debe estar montado)
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
