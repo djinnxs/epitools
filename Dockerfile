@@ -1,6 +1,11 @@
 # Usamos una imagen base de Python más estable (3.9)
 FROM python:3.9-slim
 
+# COPIAR ARCHIVOS AL CONTEXTO ANTES DE SETEAR EL WORKDIR
+# Si este paso falla, es que el repositorio Git no está sincronizado
+COPY . /app
+COPY requirements.txt /app/requirements.txt
+
 # Establecemos el directorio de trabajo
 WORKDIR /app
 
@@ -21,17 +26,12 @@ RUN apt-get update && apt-get install -y \
     # Limpiamos el caché
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Copiar archivos de dependencias
-COPY requirements.txt .
-
 # 3. Instalar dependencias de Python
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# El código se monta automáticamente, por lo que no es necesario el paso 'COPY . /app'
-
 # 5. Exponer el puerto
 EXPOSE 8501
 
-# 6. Comando de inicio (Ruta corta, ya que el código debe estar montado)
+# 6. Comando de inicio
 ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
