@@ -5,7 +5,6 @@ FROM python:3.10-slim
 ENV LANG=C.UTF-8
 
 # Variables de entorno CRÍTICAS para geopandas y pyodbc:
-# Le dice al compilador dónde buscar las librerías del sistema (libgdal y unixodbc)
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 ENV ACCEPT_GEOS=1
@@ -32,11 +31,13 @@ RUN apt-get update && apt-get install -y \
     # Limpiamos el caché
     && rm -rf /var/lib/apt/lists/*
 
-# 4. Instalar dependencias de Python (pip)
-# Instalamos pip y luego los requisitos
+# 4. PASO CRÍTICO: Pre-instalar NumPy y Cython antes de requirements.txt
 RUN pip install --upgrade pip
+RUN pip install numpy Cython
+
+# 5. Instalar el resto de dependencias de Python
 RUN pip install -r requirements.txt
 
-# 5. Exponer y ejecutar
+# 6. Exponer y ejecutar
 EXPOSE 8501
 ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
