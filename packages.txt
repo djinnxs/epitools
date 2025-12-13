@@ -1,8 +1,1 @@
-# Mínimo absoluto para geopandas
-libgdal-dev
 
-# Mínimo absoluto para pyodbc
-unixodbc-dev
-
-# Compilación general
-g++
