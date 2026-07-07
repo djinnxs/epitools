@@ -1,23 +1,14 @@
 import streamlit as st
-import folium
-from streamlit_folium import st_folium
-import random
-import time
+import base64
+import os
 import warnings
 import logging
 
-# Silenciar avisos de deprecación molestos (Streamlit/Pandas)
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 logging.getLogger("streamlit").setLevel(logging.ERROR)
 
-# Configurar la página
 st.set_page_config(page_title="Epidemiologia", page_icon=":bar_chart:", layout="wide")
-
-
-# Importar base64 para manejar la imagen si es necesario
-import base64
-import os
 
 # --- ENCABEZADO Y LOGO ---
 def get_base64_of_bin_file(bin_file):
