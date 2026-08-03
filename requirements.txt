@@ -20,6 +20,8 @@ pyarrow>=12.0.0
 numpy>=1.24.0
 scipy>=1.11.0
 streamlit-echarts==0.4.0
+pycountry>=23.0.0
+pycountry-convert>=0.9.0
 Pillow>=10.0.0
 pyodbc>=4.0.0
 sqlalchemy>=2.0.0
