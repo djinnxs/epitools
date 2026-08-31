@@ -129,14 +129,14 @@ with left_col:
         color_col_prov = "CANTIDAD"
         title_prov = f"Casos - {evento} (Provincia)"
 
-    fig_prov = px.choropleth_mapbox(
+    fig_prov = px.choropleth_map(
         merge_prov,
         geojson=merge_prov.geometry.__geo_interface__,
         locations=merge_prov.index,
         color=color_col_prov,
         hover_name="nam",
         hover_data={color_col_prov: ':.2f', "poblacion": True, "CANTIDAD": True} if metrica == "Tasa x100k" else {color_col_prov: True, "CANTIDAD": True},
-        mapbox_style="carto-positron",
+        map_style="carto-positron",
         center={"lat": -38.0, "lon": -63.0},
         zoom=3,
         color_continuous_scale="Reds" if metrica == "Casos" else "Blues"
@@ -195,14 +195,14 @@ with right_col:
         color_col_depto = "CANTIDAD"
         title_depto = f"Casos - {evento} (Departamento)"
 
-    fig_depto = px.choropleth_mapbox(
+    fig_depto = px.choropleth_map(
         merge_depto,
         geojson=merge_depto.geometry.__geo_interface__,
         locations=merge_depto.index,
         color=color_col_depto,
         hover_name="DEPARTAMENTO",
         hover_data={"PROVINCIA": True, color_col_depto: ':.2f' if metrica == "Tasa x100k" else True, "poblacion": True, "CANTIDAD": True},
-        mapbox_style="carto-positron",
+        map_style="carto-positron",
         center={"lat": -38.0, "lon": -63.0},
         zoom=3,
         color_continuous_scale="Reds" if metrica == "Casos" else "Blues"
