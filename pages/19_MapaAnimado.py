@@ -167,7 +167,7 @@ if st.button("▶ Generar Mapa Animado", type="primary"):
     # Convertimos el GeoDF a un diccionario GeoJSON estable
     gdf_dict = gdf.__geo_interface__
 
-    fig = px.choropleth_mapbox(
+    fig = px.choropleth_map(
         df_full,
         geojson=gdf_dict,
         locations='COD_DEPTO',
@@ -177,7 +177,7 @@ if st.button("▶ Generar Mapa Animado", type="primary"):
         animation_group='COD_DEPTO',
         hover_name='Departamento',
         hover_data={color_col: ':.2f', 'SEMANA': True, 'COD_DEPTO': False, 'SEMANA_LABEL': False},
-        mapbox_style='carto-darkmatter',
+        map_style='carto-darkmatter',
         center={'lat': -34.5, 'lon': -64.0},
         zoom=4.0,
         color_continuous_scale='YlOrRd',

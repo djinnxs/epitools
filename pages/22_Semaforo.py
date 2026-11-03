@@ -304,7 +304,7 @@ if st.button("🚦 Calcular Semáforo", type="primary"):
             "<br>Variación: " + merge['VAR_PCT'].fillna(0).round(1).astype(str) + "%"
         )
 
-        fig_map = px.choropleth_mapbox(
+        fig_map = px.choropleth_map(
             merge,
             geojson=merge.geometry.__geo_interface__,
             locations=merge.index,
@@ -313,7 +313,7 @@ if st.button("🚦 Calcular Semáforo", type="primary"):
             range_color=[0, 3],
             hover_name='DEPARTAMENTO',
             custom_data=['NIVEL', 'CASOS_ACT', 'TASA', 'VAR_PCT', 'RIESGO'],
-            mapbox_style='carto-darkmatter',
+            map_style='carto-darkmatter',
             center={"lat": -38.0, "lon": -63.0},
             zoom=3,
         )

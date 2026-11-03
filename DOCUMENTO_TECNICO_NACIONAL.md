@@ -41,7 +41,7 @@ El tablero debe contar con los siguientes selectores en la barra lateral o super
 
 ### 3.2 Visualización Geográfica (Mapping)
 Basado en `pages/4_Mapas.py`, el mapa debe:
-- Utilizar `plotly.express.choropleth_mapbox`.
+- Utilizar `plotly.express.choropleth_map`.
 - **Nivel Nacional:** Mostrar mapa de provincias coloreado por la métrica seleccionada.
 - **Nivel Departamental:** Al filtrar por provincia, mostrar el desglose por departamentos.
 - **Estética:** Usar escalas de colores como `Reds` para casos y `Blues` para tasas. Estilo de mapa `carto-positron`.
