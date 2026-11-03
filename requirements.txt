@@ -1,6 +1,6 @@
 streamlit==1.59.0
 pandas>=2.0.0
-plotly>=5.14.0
+plotly==5.24.1
 geopandas>=0.13.0
 folium>=0.20.0
 streamlit-folium>=0.20.0
