@@ -11,12 +11,30 @@ from openpyxl import Workbook
 from openpyxl.styles import PatternFill
 import numpy as np
 import requests
+from dotenv import load_dotenv
 
-Api_key = '40cc3bddd855ea735627db700e6a6a81'
-base_url_weather = 'http://api.openweathermap.org/data/2.5/weather'
+load_dotenv()
+
+
+def _obtener_clave_openweather():
+    """Clave de OpenWeather: variables de entorno y, si no, secrets de streamlit.io."""
+    clave = os.getenv('OPENWEATHER_API_KEY', '')
+    if clave:
+        return clave
+    try:
+        return st.secrets.get('OPENWEATHER_API_KEY', '')
+    except Exception:
+        return ''
+
+
+Api_key = _obtener_clave_openweather()
+base_url_weather = 'https://api.openweathermap.org/data/2.5/weather'
 
 # Configuracion de la página
 st.set_page_config(page_title="Epidemiologia", page_icon=":bar_chart:", layout="wide")
+
+from utils.common import show_semana_actual
+show_semana_actual()
 
 # Título de la página
 st.markdown(
@@ -31,24 +49,27 @@ city = st.text_input("Ingrese una ciudad/provincia:")
 
 consultar_tiempo_real = st.button("Consultar Tiempo Real")
 if consultar_tiempo_real and city:
-    request_url = f"{base_url_weather}?appid={Api_key}&q={city},AR&lang=es"
-    response = requests.get(request_url)
-    if response.status_code == 200:
-        data = response.json()
-        weather = data["weather"][0]["description"]
-        temperature = round(data["main"]["temp"] - 273.15, 2)
-        feels_like = round(data["main"]["feels_like"] - 273.15, 2)
-        humidity = data["main"]["humidity"]
-        wind_speed = data["wind"]["speed"]
-        wind_dir = data["wind"]["deg"]
-        st.write(f"Clima: {weather}")
-        st.write(f"Temperatura: {temperature}°C")
-        st.write(f"Sensación térmica: {feels_like}°C")
-        st.write(f"Humedad: {humidity}%")
-        st.write(f"Velocidad del viento: {wind_speed} m/s")
-        st.write(f"Dirección del viento: {wind_dir} grados")
+    if not Api_key:
+        st.warning("Falta configurar la clave **OPENWEATHER_API_KEY** en los Secrets de la app.")
     else:
-        st.write("Error al obtener la información del clima.")
+        request_url = f"{base_url_weather}?appid={Api_key}&q={city},AR&lang=es"
+        response = requests.get(request_url)
+        if response.status_code == 200:
+            data = response.json()
+            weather = data["weather"][0]["description"]
+            temperature = round(data["main"]["temp"] - 273.15, 2)
+            feels_like = round(data["main"]["feels_like"] - 273.15, 2)
+            humidity = data["main"]["humidity"]
+            wind_speed = data["wind"]["speed"]
+            wind_dir = data["wind"]["deg"]
+            st.write(f"Clima: {weather}")
+            st.write(f"Temperatura: {temperature}°C")
+            st.write(f"Sensación térmica: {feels_like}°C")
+            st.write(f"Humedad: {humidity}%")
+            st.write(f"Velocidad del viento: {wind_speed} m/s")
+            st.write(f"Dirección del viento: {wind_dir} grados")
+        else:
+            st.write(f"Error al obtener la información del clima (HTTP {response.status_code}).")
 
 # Parte 2: Clima histórico
 st.markdown("---")
