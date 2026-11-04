@@ -66,6 +66,7 @@ with menu_cols1[2]:
     st.page_link("pages/7_Poblacion.py", label="Datos Poblacionales", icon="👥")
     st.page_link("pages/6_Tablas.py", label="Explorador de Tablas", icon="🗄️")
     st.page_link("pages/15_Avanzado.py", label="Análisis Avanzado", icon="🔬")
+    st.page_link("pages/23_Ranking.py", label="Ranking por Semana", icon="🏆")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -81,9 +82,11 @@ with menu_cols2[1]:
     st.page_link("pages/18_Alertas.py", label="Sistema de Alertas", icon="🔔")
     st.page_link("pages/11_Rumores.py", label="Gestión de Rumores", icon="🗣️")
     st.page_link("pages/13_IA.py", label="Asistente IA", icon="🧠")
+    st.page_link("pages/24_RetrasoReporte.py", label="Retraso de Reporte", icon="⏳")
 
 with menu_cols2[2]:
     st.markdown("#### ℹ️ Otros")
+    st.page_link("pages/25_ReporteSemanal.py", label="Reporte Semanal (PDF)", icon="📄")
     st.page_link("pages/30_About.py", label="Acerca de SEI", icon="ℹ️")
 
 st.markdown("---")
