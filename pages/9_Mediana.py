@@ -11,6 +11,9 @@ from utils.common import query_duckdb, get_distinct_events, get_distinct_years, 
 
 st.set_page_config(page_title="Mediana", page_icon=":pencil:", layout="wide")
 
+from utils.common import show_semana_actual
+show_semana_actual()
+
 # Configurar la configuración regional
 try:
     locale.setlocale(locale.LC_ALL, 'es_ES.UTF-8')
@@ -119,23 +122,26 @@ if calcular_tabla:
         df_indice_epidemico_sem = df_indice_epidemico_sem.loc[~df_indice_epidemico_sem.index.duplicated(keep='first')].reindex(all_indices)
         df_indice_epidemico_acum = df_indice_epidemico_acum.loc[~df_indice_epidemico_acum.index.duplicated(keep='first')].reindex(all_indices)
 
+        def _reindex_series(series, index):
+            return series.loc[~series.index.duplicated(keep='first')].reindex(index)
+
         if year in df_declarados.columns:
-            col_year = df_declarados[year]
+            col_year = _reindex_series(df_declarados[year], all_indices)
         else:
             col_year = pd.Series(0, index=all_indices)
 
         if (year-1) in df_declarados.columns:
-            col_year_prev = df_declarados[year-1]
+            col_year_prev = _reindex_series(df_declarados[year-1], all_indices)
         else:
             col_year_prev = pd.Series(0, index=all_indices)
 
         if year in df_acumulados.columns:
-            col_acum_year = df_acumulados[year]
+            col_acum_year = _reindex_series(df_acumulados[year], all_indices)
         else:
             col_acum_year = pd.Series(0, index=all_indices)
 
         if (year-1) in df_acumulados.columns:
-            col_acum_year_prev = df_acumulados[year-1]
+            col_acum_year_prev = _reindex_series(df_acumulados[year-1], all_indices)
         else:
             col_acum_year_prev = pd.Series(0, index=all_indices)
 
