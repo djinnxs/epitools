@@ -209,3 +209,145 @@ def load_sql_data(query):
         print(f"Error conectando a SQL Server: {e}")
         st.error(f"Error conectando a SQL Server: {e}")
         return pd.DataFrame()
+
+# --- SEMANA EPIDEMIOLÓGICA Y CORTE DE DATOS ---
+# (helpers compartidos con epitoolsnac: ranking, retraso de reporte, boletín)
+
+from datetime import date, timedelta
+
+def get_epi_week(fecha):
+    """Semana epidemiológica (semanas inician en domingo; la SE1 contiene el 4 de enero)."""
+    anio = fecha.year
+
+    def inicio_se_1(year):
+        cuatro_enero = date(year, 1, 4)
+        retroceso = (cuatro_enero.weekday() + 1) % 7
+        return cuatro_enero - timedelta(days=retroceso)
+
+    inicio_actual = inicio_se_1(anio)
+    if fecha < inicio_actual:
+        inicio_anterior = inicio_se_1(anio - 1)
+        return ((fecha - inicio_anterior).days // 7) + 1
+    inicio_proximo = inicio_se_1(anio + 1)
+    if fecha >= inicio_proximo:
+        return 1
+    return ((fecha - inicio_actual).days // 7) + 1
+
+def get_epi_week_data(fecha):
+    """Devuelve (semana, año epidemiológico) para una fecha."""
+    anio = fecha.year
+
+    def inicio_se_1(year):
+        cuatro_enero = date(year, 1, 4)
+        retroceso = (cuatro_enero.weekday() + 1) % 7
+        return cuatro_enero - timedelta(days=retroceso)
+
+    inicio_actual = inicio_se_1(anio)
+    if fecha < inicio_actual:
+        inicio_anterior = inicio_se_1(anio - 1)
+        dias = (fecha - inicio_anterior).days
+        return (dias // 7) + 1, anio - 1
+    inicio_proximo = inicio_se_1(anio + 1)
+    if fecha >= inicio_proximo:
+        return 1, anio + 1
+    dias = (fecha - inicio_actual).days
+    return (dias // 7) + 1, anio
+
+def epiweek_to_date(anio, semana):
+    """Fecha de inicio (domingo) de la semana epidemiológica."""
+    four_jan = date(anio, 1, 4)
+    start_se1 = four_jan - timedelta(days=(four_jan.weekday() + 1) % 7)
+    return start_se1 + timedelta(weeks=semana - 1)
+
+@st.cache_data(ttl=3600)
+def get_data_corte(filename='base_semanal.parquet'):
+    """Último corte disponible en la base:
+    {'anio', 'semana', 'fecha_inicio', 'fecha_fin'} o None si no hay datos."""
+    try:
+        path = get_parquet_path(filename)
+        if not os.path.exists(path):
+            return None
+        df = pd.read_parquet(path, columns=['ANIO', 'SEMANA'])
+        if df.empty:
+            return None
+        anio = int(df['ANIO'].max())
+        semana = int(df.loc[df['ANIO'] == anio, 'SEMANA'].max())
+        inicio = epiweek_to_date(anio, semana)
+        return {
+            'anio': anio,
+            'semana': semana,
+            'fecha_inicio': inicio,
+            'fecha_fin': inicio + timedelta(days=6),  # sábado = fin de la SE
+        }
+    except Exception:
+        return None
+
+def show_data_corte(prefix='📊 Datos hasta'):
+    """Muestra el corte de datos como pie de página en cualquier página."""
+    c = get_data_corte()
+    if c:
+        st.caption(f"{prefix} {c['fecha_fin'].strftime('%d/%m/%Y')} · "
+                   f"semana epidemiológica {c['semana']} de {c['anio']}")
+    else:
+        st.caption("⚠️ No se pudo determinar el corte de datos.")
+
+# --- ESTILO VISUAL COMPARTIDO ---
+# Paleta y helpers para que todos los gráficos nuevos tengan la misma
+# identidad visual (referencias: OWID, CDC, ECDC).
+
+PALETA = [
+    "#1f77b4", "#e94560", "#2ca02c", "#ff7f0e", "#9467bd",
+    "#17becf", "#8c564b", "#bcbd22", "#7f7f7f", "#d62728",
+]
+
+# Escala bivariada 3x3 (filas = incidencia, columnas = tendencia).
+BIVAR_COLORS = {
+    "Inc. baja · Tend. baja": "#e8e8e8",
+    "Inc. baja · Tend. estable": "#b5c0da",
+    "Inc. baja · Tend. alta": "#6c83b5",
+    "Inc. media · Tend. baja": "#b8d6be",
+    "Inc. media · Tend. estable": "#90b2b3",
+    "Inc. media · Tend. alta": "#567994",
+    "Inc. alta · Tend. baja": "#73ae80",
+    "Inc. alta · Tend. estable": "#5a9178",
+    "Inc. alta · Tend. alta": "#2a5a5b",
+}
+
+def show_semana_actual():
+    """Banner uniforme con la semana epidemiológica actual.
+
+    Se muestra en todas las páginas justo debajo del título, con el mismo
+    estilo que ya usaban algunas (fondo oscuro, texto amarillo).
+    """
+    hoy = date.today()
+    semana, anio_epi = get_epi_week_data(hoy)
+    st.markdown(
+        f"""<div style="background-color: #1a1a2e; color: #ffeb3b;
+        padding: 10px 14px; border-radius: 8px; margin-bottom: 18px;
+        border: 1px solid #4a6fa5; text-align: center; font-weight: 600;
+        font-size: 1.05rem;">
+        📅 Semana Epidemiológica Actual: <b>{semana}</b> del {anio_epi}
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
+def style_fig(fig, height=420, titulo=None, x_title=None, y_title=None,
+              hovermode="x unified", mostrar_leyenda=True):
+    """Aplica el estilo visual común a una figura Plotly (tema claro, paleta fija)."""
+    fig.update_layout(
+        template="plotly_white",
+        colorway=PALETA,
+        height=height,
+        margin=dict(l=10, r=10, t=60 if titulo else 25, b=10),
+        font=dict(family="sans-serif", size=12),
+        hovermode=hovermode,
+        showlegend=mostrar_leyenda,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
+    )
+    if titulo:
+        fig.update_layout(title=dict(text=titulo, x=0.5, xanchor="center"))
+    if x_title:
+        fig.update_xaxes(title_text=x_title)
+    if y_title:
+        fig.update_yaxes(title_text=y_title)
+    return fig
