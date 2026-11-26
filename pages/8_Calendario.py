@@ -1,7 +1,6 @@
 import datetime
 import calendar
 import sys
-from io import BytesIO
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -16,12 +15,7 @@ from utils.common import (
     get_epi_week_data,
     get_parquet_path,
 )
-
-try:
-    from weasyprint import HTML
-    HAVE_WEASYPRINT = True
-except Exception:
-    HAVE_WEASYPRINT = False
+from utils.pdf_export import html_a_pdf
 
 # Configuración de página
 st.set_page_config(page_title="Calendario Epidemiológico", page_icon=":date:", layout="wide")
@@ -204,15 +198,20 @@ with tab_trad:
 
         html_content += "</table></body></html>"
 
-        if HAVE_WEASYPRINT:
-            buffer = BytesIO()
-            HTML(string=html_content).write_pdf(buffer, presentational_hints=True)
+        pdf, error_pdf = html_a_pdf(html_content, presentational_hints=True)
+        if pdf:
             st.download_button(
                 label="📥 Descargar PDF",
-                data=buffer.getvalue(),
+                data=pdf,
                 file_name=f"Calendario_EPI_{anio_seleccionado}.pdf",
                 mime="application/pdf"
             )
             st.success("¡PDF generado correctamente!")
         else:
-            st.warning("⚠️ La descarga PDF no está disponible en Windows. Instalá GTK3 o usá la captura de pantalla.")
+            st.warning(
+                "⚠️ No se pudo generar el PDF automático. Podés usar la "
+                "vista de arriba o imprimir la página desde el navegador."
+            )
+            if error_pdf:
+                with st.expander("Detalle técnico del error"):
+                    st.code(error_pdf, language=None)

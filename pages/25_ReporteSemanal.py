@@ -18,6 +18,7 @@ from utils.common import (
     show_data_corte,
     show_semana_actual,
 )
+from utils.pdf_export import html_a_pdf
 
 st.set_page_config(page_title="Reporte Semanal", page_icon="📄", layout="wide")
 show_semana_actual()
@@ -144,7 +145,7 @@ def construir_reporte(anio, evento, n_sem):
 
     flecha = ""
     if var is not None:
-        flecha = ("▲ " if var > 0 else "▼ " if var < 0 else "= ") + fmt1(abs(var)) + "%"
+        flecha = ("+ " if var > 0 else "- " if var < 0 else "= ") + fmt1(abs(var)) + "%"
 
     fecha_gen = date.today().strftime("%d/%m/%Y")
     fecha_fin = ""
@@ -240,19 +241,17 @@ if st.button("📄 Generar reporte", type="primary"):
     if html_reporte is None:
         st.warning("No hay datos para los filtros seleccionados.")
         st.session_state.pop("reporte_html", None)
+        st.session_state.pop("reporte_pdf", None)
+        st.session_state.pop("reporte_pdf_error", None)
     else:
         st.session_state["reporte_html"] = html_reporte
         st.session_state["reporte_nombre"] = nombre_archivo
         st.session_state["reporte_se"] = corte_se
-        # El PDF se intenta una sola vez, al generar el reporte:
-        # en streamlit.io funciona; en Windows sin las librerías queda None.
-        st.session_state["reporte_pdf"] = None
-        try:
-            from weasyprint import HTML
-
-            st.session_state["reporte_pdf"] = HTML(string=html_reporte).write_pdf()
-        except Exception:
-            pass
+        # El PDF se intenta una sola vez, al generar el reporte. Si WeasyPrint
+        # no puede usarse, se genera con el motor de respaldo sin librerías nativas.
+        pdf, error_pdf = html_a_pdf(html_reporte)
+        st.session_state["reporte_pdf"] = pdf
+        st.session_state["reporte_pdf_error"] = error_pdf
 
 if st.session_state.get("reporte_html"):
     html_reporte = st.session_state["reporte_html"]
@@ -274,11 +273,13 @@ if st.session_state.get("reporte_html"):
             )
         else:
             st.caption(
-                "🖨️ Al desplegar en **streamlit.io** acá aparece el botón "
-                "**Descargar PDF**. En este equipo no está la librería correspondiente: "
-                "usá el HTML de la derecha (se abre en el navegador y se puede "
-                "imprimir o guardar como PDF)."
+                "🖨️ No se pudo generar el PDF automático. Usá el HTML de la derecha: "
+                "se abre en el navegador y se puede imprimir o guardar como PDF."
             )
+            error_pdf = st.session_state.get("reporte_pdf_error")
+            if error_pdf:
+                with st.expander("Detalle técnico del error"):
+                    st.code(error_pdf, language=None)
     with col_html:
         st.download_button(
             "⬇️ Descargar HTML (imprimible)",
